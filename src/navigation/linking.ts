@@ -15,6 +15,7 @@ export const navigationLinking = {
       Services: 'services',
       Portfolio: 'portfolio',
       Contact: 'contact',
+      BlogPost: 'blog/:postId',
     },
   },
 };

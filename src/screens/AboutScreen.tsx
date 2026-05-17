@@ -11,7 +11,7 @@ import { GradientHeading } from '../components/ui/GradientHeading';
 import { COMPANY } from '../constants/company';
 import { useAppTheme } from '../context/ThemeContext';
 import { fonts } from '../theme/typography';
-import { RootStackParamList } from '../navigation/types';
+import { MainRouteName, RootStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'About'>;
 
@@ -20,7 +20,7 @@ export function AboutScreen() {
   const { theme } = useAppTheme();
 
   const navigate = useCallback(
-    (route: string) => navigation.navigate(route as keyof RootStackParamList),
+    (route: string) => navigation.navigate(route as MainRouteName),
     [navigation],
   );
 

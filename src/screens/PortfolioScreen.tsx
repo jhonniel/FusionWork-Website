@@ -10,7 +10,7 @@ import { SectionContainer } from '../components/ui/SectionContainer';
 import { FuturisticButton } from '../components/ui/FuturisticButton';
 import { GradientHeading } from '../components/ui/GradientHeading';
 import { spacing } from '../theme/typography';
-import { RootStackParamList } from '../navigation/types';
+import { MainRouteName, RootStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Portfolio'>;
 
@@ -18,7 +18,7 @@ export function PortfolioScreen() {
   const navigation = useNavigation<Nav>();
 
   const navigate = useCallback(
-    (route: string) => navigation.navigate(route as keyof RootStackParamList),
+    (route: string) => navigation.navigate(route as MainRouteName),
     [navigation],
   );
 

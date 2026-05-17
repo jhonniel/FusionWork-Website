@@ -8,7 +8,7 @@ import { FAQSection } from '../components/sections/FAQSection';
 import { ServicesSection } from '../components/sections/ServicesSection';
 import { SectionContainer } from '../components/ui/SectionContainer';
 import { GradientHeading } from '../components/ui/GradientHeading';
-import { RootStackParamList } from '../navigation/types';
+import { MainRouteName, RootStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Services'>;
 
@@ -16,7 +16,7 @@ export function ServicesScreen() {
   const navigation = useNavigation<Nav>();
 
   const navigate = useCallback(
-    (route: string) => navigation.navigate(route as keyof RootStackParamList),
+    (route: string) => navigation.navigate(route as MainRouteName),
     [navigation],
   );
 

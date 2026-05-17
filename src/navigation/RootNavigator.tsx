@@ -6,6 +6,7 @@ import { useAppTheme } from '../context/ThemeContext';
 import { AboutScreen } from '../screens/AboutScreen';
 import { ContactScreen } from '../screens/ContactScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { BlogPostScreen } from '../screens/BlogPostScreen';
 import { PortfolioScreen } from '../screens/PortfolioScreen';
 import { ServicesScreen } from '../screens/ServicesScreen';
 import { navigationLinking } from './linking';
@@ -54,6 +55,7 @@ export function RootNavigator() {
         <Stack.Screen name="Services" component={ServicesScreen} />
         <Stack.Screen name="Portfolio" component={PortfolioScreen} />
         <Stack.Screen name="Contact" component={ContactScreen} />
+        <Stack.Screen name="BlogPost" component={BlogPostScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

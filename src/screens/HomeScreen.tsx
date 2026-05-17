@@ -12,7 +12,7 @@ import { PortfolioSection } from '../components/sections/PortfolioSection';
 import { ServicesSection } from '../components/sections/ServicesSection';
 import { TestimonialsSection } from '../components/sections/TestimonialsSection';
 import { WhyChooseUsSection } from '../components/sections/WhyChooseUsSection';
-import { RootStackParamList } from '../navigation/types';
+import { MainRouteName, RootStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -21,7 +21,7 @@ export function HomeScreen() {
 
   const navigate = useCallback(
     (route: string) => {
-      navigation.navigate(route as keyof RootStackParamList);
+      navigation.navigate(route as MainRouteName);
     },
     [navigation],
   );

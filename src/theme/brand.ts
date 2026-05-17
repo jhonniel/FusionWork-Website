@@ -17,9 +17,7 @@ export const SERVICE_ACCENTS: Record<string, BrandAccent> = {
   'web-apps': 'purple',
   'mobile-apps': 'yellow',
   'ui-ux': 'purple',
-  'cloud-api': 'blue',
   automation: 'blue',
-  'ai-systems': 'blue',
   support: 'orange',
 };
 

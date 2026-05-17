@@ -15,30 +15,6 @@ export const STATS = [
   { label: 'Delivery', value: 'Fast', icon: 'flash-outline' as const },
 ];
 
-export const BLOG_POSTS = [
-  {
-    id: '1',
-    title: 'How AI Is Reshaping Philippine SMEs',
-    excerpt: 'Practical ways local businesses can adopt intelligent automation without huge budgets.',
-    date: 'Apr 12, 2026',
-    readTime: '6 min',
-  },
-  {
-    id: '2',
-    title: 'Building Scalable Web Apps in 2026',
-    excerpt: 'Architecture patterns we use at FUSION WORK for performance and maintainability.',
-    date: 'Mar 28, 2026',
-    readTime: '8 min',
-  },
-  {
-    id: '3',
-    title: 'UI/UX Trends for SaaS Products',
-    excerpt: 'Glassmorphism, motion design, and accessibility — what actually converts users.',
-    date: 'Mar 10, 2026',
-    readTime: '5 min',
-  },
-];
-
 export const FAQ_ITEMS = [
   {
     question: 'What industries do you serve?',

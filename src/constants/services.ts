@@ -45,27 +45,11 @@ export const SERVICES: ServiceItem[] = [
     accent: 'purple',
   },
   {
-    id: 'cloud-api',
-    title: 'Cloud & API Integration',
-    description:
-      'Seamless integrations across cloud services, third-party APIs, and microservices for connected ecosystems.',
-    icon: 'cloud-outline',
-    accent: 'blue',
-  },
-  {
     id: 'automation',
     title: 'Business Automation Solutions',
     description:
       'Intelligent automation that reduces manual work, accelerates operations, and improves decision-making.',
     icon: 'hardware-chip-outline',
-    accent: 'blue',
-  },
-  {
-    id: 'ai-systems',
-    title: 'AI-Powered Systems',
-    description:
-      'Smart assistants, predictive analytics, and AI workflows that unlock efficiency and competitive advantage.',
-    icon: 'sparkles-outline',
     accent: 'blue',
   },
   {
