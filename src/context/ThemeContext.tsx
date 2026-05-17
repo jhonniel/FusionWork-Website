@@ -17,7 +17,7 @@ const STORAGE_KEY = '@fusionwork/theme';
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>('dark');
+  const [mode, setMode] = useState<ThemeMode>('light');
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
