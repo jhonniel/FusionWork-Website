@@ -1,0 +1,60 @@
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+} from 'react-native-reanimated';
+
+import { useAppTheme } from '../../context/ThemeContext';
+import { fonts } from '../../theme/typography';
+import { GlassCard } from './GlassCard';
+
+type Props = {
+  value: string;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  index?: number;
+};
+
+export function StatCard({ value, label, icon, index = 0 }: Props) {
+  const { theme } = useAppTheme();
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(20);
+
+  useEffect(() => {
+    opacity.value = withDelay(index * 80, withSpring(1));
+    translateY.value = withDelay(index * 80, withSpring(0, { damping: 16 }));
+  }, [index, opacity, translateY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return (
+    <Animated.View style={[styles.wrap, animatedStyle]}>
+      <GlassCard style={styles.card}>
+        <Ionicons name={icon} size={24} color={theme.gradient[0]} />
+        <Text style={[styles.value, { color: theme.text }]}>{value}</Text>
+        <Text style={[styles.label, { color: theme.textMuted }]}>{label}</Text>
+      </GlassCard>
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrap: { flex: 1, minWidth: 140 },
+  card: { alignItems: 'center', gap: 6, paddingVertical: 28 },
+  value: {
+    fontFamily: fonts.display,
+    fontSize: 32,
+    marginTop: 10,
+  },
+  label: {
+    fontFamily: fonts.medium,
+    fontSize: 13,
+  },
+});
