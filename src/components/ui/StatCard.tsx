@@ -10,6 +10,7 @@ import Animated, {
 
 import { useAppTheme } from '../../context/ThemeContext';
 import { fonts } from '../../theme/typography';
+import { CountUpValue } from './CountUpValue';
 import { GlassCard } from './GlassCard';
 
 type Props = {
@@ -17,9 +18,10 @@ type Props = {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   index?: number;
+  countUp?: boolean;
 };
 
-export function StatCard({ value, label, icon, index = 0 }: Props) {
+export function StatCard({ value, label, icon, index = 0, countUp = false }: Props) {
   const { theme } = useAppTheme();
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
@@ -38,7 +40,15 @@ export function StatCard({ value, label, icon, index = 0 }: Props) {
     <Animated.View style={[styles.wrap, animatedStyle]}>
       <GlassCard style={styles.card}>
         <Ionicons name={icon} size={24} color={theme.gradient[0]} />
-        <Text style={[styles.value, { color: theme.text }]}>{value}</Text>
+        {countUp ? (
+          <CountUpValue
+            value={value}
+            style={[styles.value, { color: theme.text }]}
+            delay={index * 100}
+          />
+        ) : (
+          <Text style={[styles.value, { color: theme.text }]}>{value}</Text>
+        )}
         <Text style={[styles.label, { color: theme.textMuted }]}>{label}</Text>
       </GlassCard>
     </Animated.View>

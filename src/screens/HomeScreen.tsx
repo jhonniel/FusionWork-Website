@@ -35,7 +35,7 @@ export function HomeScreen() {
       <AboutSection compact />
       <ServicesSection />
       <WhyChooseUsSection />
-      <PortfolioSection onViewAll={() => navigate('Portfolio')} limit={3} />
+      <PortfolioSection />
       <TestimonialsSection />
       <BlogSection />
       <FAQSection />

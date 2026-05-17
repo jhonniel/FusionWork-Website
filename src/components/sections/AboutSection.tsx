@@ -20,8 +20,18 @@ export function AboutSection({ compact = false }: { compact?: boolean }) {
       <SectionHeader
         eyebrow="About Us"
         title={compact ? 'Who We Are' : 'Our Story'}
-        subtitle={COMPANY.about}
+        subtitle={compact ? COMPANY.about : undefined}
       />
+
+      {!compact ? (
+        <View style={styles.story}>
+          {COMPANY.story.map((paragraph, index) => (
+            <Text key={index} style={[styles.storyParagraph, { color: theme.textMuted }]}>
+              {paragraph}
+            </Text>
+          ))}
+        </View>
+      ) : null}
 
       <View style={[styles.grid, isDesktop && { flexDirection: 'row' }]}>
         <GlassCard style={{ flex: 1 }}>
@@ -56,6 +66,19 @@ export function AboutSection({ compact = false }: { compact?: boolean }) {
 }
 
 const styles = StyleSheet.create({
+  story: {
+    gap: 18,
+    marginBottom: 36,
+    maxWidth: 720,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  storyParagraph: {
+    fontFamily: fonts.regular,
+    fontSize: 16,
+    lineHeight: 27,
+    textAlign: 'center',
+  },
   grid: { gap: 16, marginBottom: 32 },
   iconWrap: {
     width: 44,

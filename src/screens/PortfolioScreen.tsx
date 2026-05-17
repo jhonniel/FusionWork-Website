@@ -36,7 +36,7 @@ export function PortfolioScreen() {
           style={{ marginTop: spacing.md }}
         />
       </SectionContainer>
-      <PortfolioSection />
+      <PortfolioSection variant="grid" />
       <TestimonialsSection />
     </ScreenWrapper>
   );

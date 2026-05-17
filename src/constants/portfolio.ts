@@ -1,53 +1,60 @@
-import { brand } from '../theme/brand';
+import { ImageSourcePropType } from 'react-native';
 
 export type PortfolioProject = {
   id: string;
   title: string;
   category: string;
   description: string;
-  tech: string[];
-  gradient: [string, string];
+  image: ImageSourcePropType;
 };
 
 export const PORTFOLIO: PortfolioProject[] = [
   {
-    id: 'bms',
-    title: 'Business Management System',
-    category: 'Enterprise',
-    description: 'Unified dashboard for operations, finance, and team collaboration.',
-    tech: ['React', 'Node.js', 'PostgreSQL'],
-    gradient: [brand.yellow, brand.orange],
+    id: 'finditfast',
+    title: 'FindITFast',
+    category: 'Lost & Found',
+    description:
+      'Community-powered lost and found platform—search reports, post items, and smart matching connects people from lost to found in just a few clicks.',
+    image: require('../../assets/portfolio/finditfast.png'),
   },
   {
-    id: 'tourism',
-    title: 'Tourism Booking Platform',
-    category: 'Travel',
-    description: 'End-to-end booking with payments, itineraries, and admin analytics.',
-    tech: ['Next.js', 'Stripe', 'MongoDB'],
-    gradient: [brand.purple, brand.red],
+    id: 'inventorypro',
+    title: 'InventoryPro',
+    category: 'Inventory Management',
+    description:
+      'Comprehensive inventory management—track products, manage suppliers, monitor stock levels, and make data-driven decisions with real-time analytics and QR scanning.',
+    image: require('../../assets/portfolio/inventorypro.png'),
   },
   {
-    id: 'ai-chat',
-    title: 'AI Chat Assistant',
-    category: 'AI',
-    description: 'Conversational support bot with knowledge base and live handoff.',
-    tech: ['Python', 'OpenAI', 'WebSocket'],
-    gradient: [brand.blue, brand.purple],
+    id: 'whatsnearby',
+    title: 'whatsnearby',
+    category: 'Community Maps',
+    description:
+      'Shared maps for everyday needs—built by the community, for the community. Discover restrooms, food, hangouts, and trusted local pins neighbors share, with directions when it matters.',
+    image: require('../../assets/portfolio/whatsnearby.png'),
   },
   {
-    id: 'delivery',
-    title: 'Mobile Delivery App',
-    category: 'Logistics',
-    description: 'Real-time tracking, rider management, and customer notifications.',
-    tech: ['React Native', 'Firebase', 'Maps API'],
-    gradient: [brand.red, brand.orange],
+    id: 'bookease',
+    title: 'BookEase',
+    category: 'Reservation Platform',
+    description:
+      'A modern, all-in-one reservation platform that makes booking fast, simple, and reliable. Real-time availability and instant confirmations put convenience and control right at your fingertips.',
+    image: require('../../assets/portfolio/bookease.png'),
   },
   {
-    id: 'inventory',
-    title: 'Inventory Management System',
-    category: 'Retail',
-    description: 'Stock control, supplier workflows, and automated reorder alerts.',
-    tech: ['Vue', 'Laravel', 'MySQL'],
-    gradient: [brand.red, brand.redDark],
+    id: 'easypos-hub',
+    title: 'EasyPOS Hub',
+    category: 'POS & Inventory',
+    description:
+      'An all-in-one inventory and point-of-sale management system designed to help businesses simplify daily operations—with fast checkout, real-time stock, and streamlined order workflows.',
+    image: require('../../assets/portfolio/easypos-hub.png'),
+  },
+  {
+    id: 'travel-planner',
+    title: 'Travel Planner',
+    category: 'Travel & Collaboration',
+    description:
+      'The ultimate travel planning platform that brings friends together. Collaborate, track expenses, manage itineraries, and create unforgettable memories.',
+    image: require('../../assets/portfolio/travel-planner.png'),
   },
 ];

@@ -25,7 +25,13 @@ export function WhyChooseUsSection() {
       <View style={styles.stats}>
         {STATS.map((s, i) => (
           <View key={s.label} style={{ width: itemWidth, padding: 6 }}>
-            <StatCard value={s.value} label={s.label} icon={s.icon} index={i} />
+            <StatCard
+              value={s.value}
+              label={s.label}
+              icon={s.icon}
+              index={i}
+              countUp={s.label === 'Projects' || s.label === 'Clients'}
+            />
           </View>
         ))}
       </View>
