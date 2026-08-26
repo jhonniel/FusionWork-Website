@@ -73,7 +73,7 @@ export function HeroSection({ onGetStarted, onViewServices }: Props) {
             />
           </View>
 
-          <View style={[styles.trust, isSmallPhone && styles.trustGrid]}>
+          <View style={[styles.trust, isMobile && styles.trustMobile]}>
             {STATS.map((s, i) => {
               const accents = [brand.red, brand.yellow, brand.blue, brand.orange];
               const color = accents[i % accents.length];
@@ -83,7 +83,7 @@ export function HeroSection({ onGetStarted, onViewServices }: Props) {
                   style={[
                     styles.trustItem,
                     { borderColor: theme.cardBorder },
-                    isSmallPhone && styles.trustItemHalf,
+                    isMobile && styles.trustItemMobile,
                   ]}
                 >
                   <Ionicons name={s.icon} size={15} color={color} />
@@ -156,12 +156,15 @@ const styles = StyleSheet.create({
     gap: 8,
     width: '100%',
   },
-  trustGrid: {
-    justifyContent: 'space-between',
+  trustMobile: {
+    justifyContent: 'center',
+    alignSelf: 'center',
+    maxWidth: 360,
   },
   trustItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -169,8 +172,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexShrink: 1,
   },
-  trustItemHalf: {
-    width: '48%',
+  trustItemMobile: {
+    width: '47%',
   },
   trustValue: {
     fontFamily: fonts.bold,
