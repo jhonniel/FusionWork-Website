@@ -34,12 +34,12 @@ export const PORTFOLIO: PortfolioProject[] = [
     image: require('../../assets/portfolio/whatsnearby.png'),
   },
   {
-    id: 'bookease',
-    title: 'BookEase',
+    id: 'rezerba',
+    title: 'REZERBA',
     category: 'Reservation Platform',
     description:
-      'A modern, all-in-one reservation platform that makes booking fast, simple, and reliable. Real-time availability and instant confirmations put convenience and control right at your fingertips.',
-    image: require('../../assets/portfolio/bookease.png'),
+      'An all-in-one booking platform—discover services, manage schedules, confirm reservations, and track booking activity in one organized place.',
+    image: require('../../assets/portfolio/rezerba.png'),
   },
   {
     id: 'easypos-hub',
@@ -56,5 +56,29 @@ export const PORTFOLIO: PortfolioProject[] = [
     description:
       'The ultimate travel planning platform that brings friends together. Collaborate, track expenses, manage itineraries, and create unforgettable memories.',
     image: require('../../assets/portfolio/travel-planner.png'),
+  },
+  {
+    id: 'paypals',
+    title: 'PayPals',
+    category: 'Bill Splitting',
+    description:
+      'Split every receipt fairly and fast in pesos—scan a bill, assign what everyone ordered, and settle the total without spreadsheets, group chats, or awkward calculations.',
+    image: require('../../assets/portfolio/paypals.png'),
+  },
+  {
+    id: 'island-coolers',
+    title: 'Island Coolers',
+    category: 'Food & Beverage',
+    description:
+      'Fresh · cold · delivered—order soda flavors, iced coffee, and matcha in a few taps, track live, and earn rewards with every sip.',
+    image: require('../../assets/portfolio/island-coolers.png'),
+  },
+  {
+    id: 'dabills',
+    title: 'DaBills',
+    category: 'Bills & Subscriptions',
+    description:
+      'Recurring bills and subscriptions tracked in one place—see Netflix, Spotify, and more at a glance so you never miss a payment.',
+    image: require('../../assets/portfolio/dabills.png'),
   },
 ];
