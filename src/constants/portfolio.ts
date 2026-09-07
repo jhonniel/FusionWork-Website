@@ -89,4 +89,12 @@ export const PORTFOLIO: PortfolioProject[] = [
       'AI marketing desk for Facebook Pages—audit performance, generate on-brand content, schedule posts, and grow with recommendations for SaaS teams and agencies.',
     image: require('../../assets/portfolio/growthai-smm.png'),
   },
+  {
+    id: 'copper-spoon',
+    title: 'Copper Spoon',
+    category: 'Restaurant Operations',
+    description:
+      'QR table ordering for the dining room—guests scan, order, and pay while kitchen, cashier, and staff see every ticket live. No customer accounts required.',
+    image: require('../../assets/portfolio/copper-spoon.png'),
+  },
 ];
