@@ -97,4 +97,12 @@ export const PORTFOLIO: PortfolioProject[] = [
       'QR table ordering for the dining room—guests scan, order, and pay while kitchen, cashier, and staff see every ticket live. No customer accounts required.',
     image: require('../../assets/portfolio/copper-spoon.png'),
   },
+  {
+    id: 'aurelis',
+    title: 'AURELIS',
+    category: 'Luxury Fragrance',
+    description:
+      'A maison de parfum digital experience—explore Collection 01 with olfactive architecture, campaign storytelling, and a refined dark luxury aesthetic.',
+    image: require('../../assets/portfolio/aurelis.png'),
+  },
 ];
