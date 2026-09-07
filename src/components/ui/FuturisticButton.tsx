@@ -24,6 +24,7 @@ type Props = {
   style?: ViewStyle;
   icon?: React.ReactNode;
   fullWidth?: boolean;
+  disabled?: boolean;
 };
 
 export function FuturisticButton({
@@ -34,12 +35,14 @@ export function FuturisticButton({
   style,
   icon,
   fullWidth,
+  disabled = false,
 }: Props) {
   const { theme } = useAppTheme();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+    opacity: disabled ? 0.55 : 1,
   }));
 
   const sizeStyles = {
@@ -48,11 +51,18 @@ export function FuturisticButton({
     lg: { padV: 16, padH: 28, font: 15 },
   }[size];
 
+  const handlePress = () => {
+    if (disabled) return;
+    onPress?.();
+  };
+
   if (variant === 'primary') {
     return (
       <AnimatedPressable
-        onPress={onPress}
+        onPress={handlePress}
+        disabled={disabled}
         onPressIn={() => {
+          if (disabled) return;
           scale.value = withSpring(0.98, { damping: 18 });
         }}
         onPressOut={() => {
@@ -78,8 +88,10 @@ export function FuturisticButton({
 
   return (
     <AnimatedPressable
-      onPress={onPress}
+      onPress={handlePress}
+      disabled={disabled}
       onPressIn={() => {
+        if (disabled) return;
         scale.value = withSpring(0.98, { damping: 18 });
       }}
       onPressOut={() => {

@@ -42,6 +42,18 @@ npm run build    # Static web export → dist/
    - **Install command:** `npm install`
 4. Deploy. Vercel runs `expo export --platform web` and serves the static site from `dist/`.
 
+### Contact form email (Resend)
+
+Add these **Environment Variables** in the Vercel project (Settings → Environment Variables):
+
+- `RESEND_API_KEY` — your Resend API key
+- `RESEND_FROM_EMAIL` — e.g. `FUSION WORK <onboarding@resend.dev>` until you verify a domain
+- `CONTACT_NOTIFY_EMAIL` — defaults to `thefusionwork@gmail.com` (inbox that receives each submission)
+
+Copy `.env.example` to `.env.local` for local API testing with `npx vercel dev`.
+
+> For production sending from your own domain, verify it at [resend.com/domains](https://resend.com/domains) and update `RESEND_FROM_EMAIL`.
+
 Client routes (`/about`, `/services`, etc.) are handled by React Navigation with SPA rewrites to `index.html`.
 
 To verify locally before deploying:

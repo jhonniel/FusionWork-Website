@@ -81,4 +81,12 @@ export const PORTFOLIO: PortfolioProject[] = [
       'Recurring bills and subscriptions tracked in one place—see Netflix, Spotify, and more at a glance so you never miss a payment.',
     image: require('../../assets/portfolio/dabills.png'),
   },
+  {
+    id: 'growthai-smm',
+    title: 'GrowthAI SMM',
+    category: 'AI Marketing',
+    description:
+      'AI marketing desk for Facebook Pages—audit performance, generate on-brand content, schedule posts, and grow with recommendations for SaaS teams and agencies.',
+    image: require('../../assets/portfolio/growthai-smm.png'),
+  },
 ];

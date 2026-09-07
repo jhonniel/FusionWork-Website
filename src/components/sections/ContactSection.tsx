@@ -19,6 +19,23 @@ import { GlassCard } from '../ui/GlassCard';
 import { SectionContainer } from '../ui/SectionContainer';
 import { SectionHeader } from '../ui/SectionHeader';
 
+function contactApiUrl() {
+  const configured = process.env.EXPO_PUBLIC_CONTACT_API_URL?.trim();
+  if (configured) return configured;
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    return `${window.location.origin}/api/contact`;
+  }
+  return '/api/contact';
+}
+
+function showAlert(title: string, message: string) {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    window.alert(`${title}\n\n${message}`);
+    return;
+  }
+  Alert.alert(title, message);
+}
+
 export function ContactSection({ fullPage = false }: { fullPage?: boolean }) {
   const { theme } = useAppTheme();
   const { isDesktop } = useResponsive();
@@ -26,16 +43,53 @@ export function ContactSection({ fullPage = false }: { fullPage?: boolean }) {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [focused, setFocused] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!name.trim() || !email.trim() || !message.trim()) {
-      Alert.alert('Missing fields', 'Please fill in all fields before sending.');
+      showAlert('Missing fields', 'Please fill in all fields before sending.');
       return;
     }
-    Alert.alert('Message sent', 'Thank you! Our team will get back to you shortly.');
-    setName('');
-    setEmail('');
-    setMessage('');
+
+    setSending(true);
+    try {
+      const response = await fetch(contactApiUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          message: message.trim(),
+        }),
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; ok?: boolean }
+        | null;
+
+      if (!response.ok) {
+        showAlert(
+          'Could not send',
+          payload?.error ?? 'Something went wrong. Please try again in a moment.',
+        );
+        return;
+      }
+
+      showAlert(
+        'Message sent',
+        'Thank you! A confirmation email is on the way, and our team will get back to you shortly.',
+      );
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch {
+      showAlert(
+        'Could not send',
+        'Unable to reach the server. Please check your connection and try again.',
+      );
+    } finally {
+      setSending(false);
+    }
   };
 
   const inputStyle = (field: string) => [
@@ -68,6 +122,7 @@ export function ContactSection({ fullPage = false }: { fullPage?: boolean }) {
             onBlur={() => setFocused(null)}
             placeholder="Your name"
             placeholderTextColor={theme.textSubtle}
+            editable={!sending}
             style={inputStyle('name')}
           />
           <Text style={[styles.label, { color: theme.textMuted }]}>Email</Text>
@@ -80,6 +135,7 @@ export function ContactSection({ fullPage = false }: { fullPage?: boolean }) {
             placeholderTextColor={theme.textSubtle}
             keyboardType="email-address"
             autoCapitalize="none"
+            editable={!sending}
             style={inputStyle('email')}
           />
           <Text style={[styles.label, { color: theme.textMuted }]}>Message</Text>
@@ -92,9 +148,16 @@ export function ContactSection({ fullPage = false }: { fullPage?: boolean }) {
             placeholderTextColor={theme.textSubtle}
             multiline
             numberOfLines={4}
+            editable={!sending}
             style={[...inputStyle('message'), styles.textarea]}
           />
-          <FuturisticButton label="Send Message" onPress={submit} fullWidth style={{ marginTop: spacing.md }} />
+          <FuturisticButton
+            label={sending ? 'Sending…' : 'Send Message'}
+            onPress={submit}
+            fullWidth
+            disabled={sending}
+            style={{ marginTop: spacing.md }}
+          />
         </GlassCard>
 
         <View style={[styles.side, { flex: 1 }]}>
