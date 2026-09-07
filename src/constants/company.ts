@@ -16,6 +16,7 @@ export const COMPANY = {
   vision: 'To become a leading software and technology solutions provider in the Philippines.',
   values: ['Innovation', 'Collaboration', 'Reliability', 'Creativity', 'Excellence'] as const,
   phone: '+63 976 016 0087',
+  email: 'thefusionwork@gmail.com',
   location: 'Davao City, Philippines',
   facebook: 'https://www.facebook.com/thefusionwork/',
   copyright: `© ${new Date().getFullYear()} FUSION WORK. All rights reserved.`,
