@@ -105,4 +105,12 @@ export const PORTFOLIO: PortfolioProject[] = [
       'A maison de parfum digital experience—explore Collection 01 with olfactive architecture, campaign storytelling, and a refined dark luxury aesthetic.',
     image: require('../../assets/portfolio/aurelis.png'),
   },
+  {
+    id: 'jry-rentals',
+    title: 'JRY Rentals',
+    category: 'Equipment Rental',
+    description:
+      'Premium gear rental for cameras, drones, and Starlink—browse equipment, check availability, and book securely for travel, events, and content creation.',
+    image: require('../../assets/portfolio/jry-rentals.png'),
+  },
 ];
