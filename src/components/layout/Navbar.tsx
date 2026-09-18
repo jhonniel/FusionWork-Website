@@ -62,7 +62,7 @@ function NavTab({
 
   const textStyle = useAnimatedStyle(() => ({
     color: interpolateColor(progress.value, [0, 1], [mutedColor, brand.red]),
-    transform: [{ scale: interpolate(progress.value, [0, 1], [1, 1.03]) }],
+    transform: [{ scale: interpolate(progress.value, [0, 1], [1, 1.015]) }],
   }));
 
   return (

@@ -2,10 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 import { useAppTheme } from '../../context/ThemeContext';
@@ -24,11 +25,17 @@ type Props = {
 export function StatCard({ value, label, icon, index = 0, countUp = false }: Props) {
   const { theme } = useAppTheme();
   const opacity = useSharedValue(0);
-  const translateY = useSharedValue(20);
+  const translateY = useSharedValue(16);
 
   useEffect(() => {
-    opacity.value = withDelay(index * 80, withSpring(1));
-    translateY.value = withDelay(index * 80, withSpring(0, { damping: 16 }));
+    opacity.value = withDelay(
+      index * 70,
+      withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) }),
+    );
+    translateY.value = withDelay(
+      index * 70,
+      withTiming(0, { duration: 420, easing: Easing.out(Easing.cubic) }),
+    );
   }, [index, opacity, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({

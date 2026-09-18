@@ -16,8 +16,6 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withSequence,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -92,10 +90,8 @@ export function SiteChat({ onNavigate }: Props) {
     panelProgress.value = 0;
     setMounted(true);
     setOpen(true);
-    fabScale.value = withSequence(
-      withSpring(1.08, { damping: 14, stiffness: 200 }),
-      withTiming(1, { duration: 220 }),
-    );
+    fabScale.value = withTiming(1.04, { duration: 140 });
+    fabScale.value = withTiming(1, { duration: 180 });
   }, [fabScale, panelProgress]);
 
   const closeChat = useCallback(() => {
@@ -103,10 +99,8 @@ export function SiteChat({ onNavigate }: Props) {
     panelProgress.value = withTiming(0, { duration: CLOSE_MS, easing: CLOSE_EASE }, (finished) => {
       if (finished) runOnJS(finishUnmount)();
     });
-    fabScale.value = withSequence(
-      withSpring(0.94, { damping: 16 }),
-      withTiming(1, { duration: 200 }),
-    );
+    fabScale.value = withTiming(0.96, { duration: 120 });
+    fabScale.value = withTiming(1, { duration: 160 });
   }, [fabScale, finishUnmount, panelProgress]);
 
   const toggleChat = useCallback(() => {
@@ -128,8 +122,8 @@ export function SiteChat({ onNavigate }: Props) {
   const panelAnimStyle = useAnimatedStyle(() => ({
     opacity: panelProgress.value,
     transform: [
-      { translateY: interpolate(panelProgress.value, [0, 1], [28, 0]) },
-      { scale: interpolate(panelProgress.value, [0, 1], [0.94, 1]) },
+      { translateY: interpolate(panelProgress.value, [0, 1], [16, 0]) },
+      { scale: interpolate(panelProgress.value, [0, 1], [0.98, 1]) },
     ],
   }));
 

@@ -4,6 +4,7 @@ import { StyleSheet, View, ViewStyle } from 'react-native';
 import { useAppTheme } from '../../context/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { spacing } from '../../theme/typography';
+import { Reveal } from './Reveal';
 
 type Props = {
   children: React.ReactNode;
@@ -30,7 +31,7 @@ export function SectionContainer({ children, alternate = false, style }: Props) 
         style,
       ]}
     >
-      <View
+      <Reveal
         style={[
           styles.inner,
           {
@@ -42,7 +43,7 @@ export function SectionContainer({ children, alternate = false, style }: Props) 
         ]}
       >
         {children}
-      </View>
+      </Reveal>
     </View>
   );
 }

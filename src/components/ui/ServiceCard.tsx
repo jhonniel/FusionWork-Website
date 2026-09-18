@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 import { ServiceItem } from '../../constants/services';
@@ -15,6 +15,8 @@ import { fonts, radius } from '../../theme/typography';
 import { GlassCard } from './GlassCard';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const SOFT = { duration: 180 };
 
 type Props = {
   service: ServiceItem;
@@ -26,9 +28,14 @@ export function ServiceCard({ service, index = 0, onPress }: Props) {
   const { theme } = useAppTheme();
   const accent = getAccentColor(service.accent);
   const scale = useSharedValue(1);
+  const arrowX = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
+  }));
+
+  const arrowStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: arrowX.value }],
   }));
 
   const num = String(index + 1).padStart(2, '0');
@@ -36,11 +43,21 @@ export function ServiceCard({ service, index = 0, onPress }: Props) {
   return (
     <AnimatedPressable
       onPress={onPress}
+      onHoverIn={() => {
+        scale.value = withTiming(1.015, SOFT);
+        arrowX.value = withTiming(4, SOFT);
+      }}
+      onHoverOut={() => {
+        scale.value = withTiming(1, SOFT);
+        arrowX.value = withTiming(0, SOFT);
+      }}
       onPressIn={() => {
-        scale.value = withSpring(1.01, { damping: 16 });
+        scale.value = withTiming(0.99, { duration: 120 });
+        arrowX.value = withTiming(5, { duration: 120 });
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, { damping: 16 });
+        scale.value = withTiming(1, SOFT);
+        arrowX.value = withTiming(0, SOFT);
       }}
       style={[styles.wrap, animatedStyle]}
     >
@@ -60,7 +77,9 @@ export function ServiceCard({ service, index = 0, onPress }: Props) {
         </Text>
         <View style={styles.learn}>
           <Text style={[styles.learnText, { color: accent }]}>Learn more</Text>
-          <Ionicons name="arrow-forward" size={14} color={accent} />
+          <Animated.View style={arrowStyle}>
+            <Ionicons name="arrow-forward" size={14} color={accent} />
+          </Animated.View>
         </View>
       </GlassCard>
     </AnimatedPressable>

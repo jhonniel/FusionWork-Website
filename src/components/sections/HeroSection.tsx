@@ -1,6 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { COMPANY } from '../../constants/company';
 import { STATS } from '../../constants/navigation';
@@ -12,6 +19,7 @@ import { GridOverlay } from '../layout/GridOverlay';
 import { DashboardMockup } from '../ui/DashboardMockup';
 import { FuturisticButton } from '../ui/FuturisticButton';
 import { SplitHeadline } from '../ui/GradientText';
+import { Reveal } from '../ui/Reveal';
 
 type Props = {
   onGetStarted: () => void;
@@ -22,6 +30,20 @@ export function HeroSection({ onGetStarted, onViewServices }: Props) {
   const { theme } = useAppTheme();
   const { isDesktop, isMobile, isSmallPhone, horizontalPadding, contentWidth, width } =
     useResponsive();
+  const pulse = useSharedValue(1);
+
+  useEffect(() => {
+    pulse.value = withRepeat(
+      withTiming(0.35, { duration: 1100, easing: Easing.inOut(Easing.sin) }),
+      -1,
+      true,
+    );
+  }, [pulse]);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: pulse.value,
+    transform: [{ scale: 0.85 + (1 - pulse.value) * 0.35 }],
+  }));
 
   const titleSize = isSmallPhone ? 30 : isMobile ? 34 : 52;
   const titleLine = isSmallPhone ? 36 : isMobile ? 40 : 58;
@@ -36,9 +58,12 @@ export function HeroSection({ onGetStarted, onViewServices }: Props) {
           isDesktop && styles.row,
         ]}
       >
-        <View style={[styles.copy, isDesktop && styles.copyDesktop]}>
+        <Reveal immediate style={[styles.copy, isDesktop && styles.copyDesktop]} distance={16}>
           <View style={[styles.badge, { borderColor: `${brand.red}44`, backgroundColor: `${brand.red}10` }]}>
-            <View style={[styles.badgeDot, { backgroundColor: brand.red }]} />
+            <View style={styles.badgeDotWrap}>
+              <Animated.View style={[styles.badgeDotRing, { borderColor: brand.red }, pulseStyle]} />
+              <View style={[styles.badgeDot, { backgroundColor: brand.red }]} />
+            </View>
             <Text
               style={[styles.badgeText, { color: theme.textMuted }]}
               numberOfLines={isSmallPhone ? 2 : 1}
@@ -95,11 +120,20 @@ export function HeroSection({ onGetStarted, onViewServices }: Props) {
               );
             })}
           </View>
-        </View>
+        </Reveal>
 
-        <View style={[styles.mockup, !isDesktop && styles.mockupMobile, { maxWidth: width - horizontalPadding * 2 }]}>
+        <Reveal
+          immediate
+          delay={80}
+          distance={18}
+          style={[
+            styles.mockup,
+            !isDesktop && styles.mockupMobile,
+            { maxWidth: width - horizontalPadding * 2 },
+          ]}
+        >
           <DashboardMockup />
-        </View>
+        </Reveal>
       </View>
     </View>
   );
@@ -111,12 +145,12 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sectionSm,
     minHeight: 480,
     position: 'relative',
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   inner: { gap: 32, zIndex: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 40 },
   copy: { gap: spacing.md, zIndex: 2, width: '100%' },
-  copyDesktop: { flex: 1, maxWidth: 560 },
+  copyDesktop: { flex: 1, maxWidth: 560, minWidth: 0 },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -129,7 +163,26 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
     maxWidth: '100%',
   },
-  badgeDot: { width: 6, height: 6, borderRadius: 3, flexShrink: 0 },
+  badgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    flexShrink: 0,
+  },
+  badgeDotWrap: {
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  badgeDotRing: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 1.5,
+  },
   badgeText: {
     fontFamily: fonts.medium,
     fontSize: 12,
@@ -186,11 +239,12 @@ const styles = StyleSheet.create({
   },
   mockup: {
     flex: 1,
+    minWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
   },
   mockupMobile: {
     marginTop: spacing.md,
+    width: '100%',
   },
 });

@@ -1,28 +1,68 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { PortfolioProject } from '../../constants/portfolio';
 import { useAppTheme } from '../../context/ThemeContext';
 import { fonts } from '../../theme/typography';
 import { GlassCard } from './GlassCard';
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 const CARD_HEIGHT = 400;
 const BANNER_HEIGHT = 200;
+const SOFT = { duration: 200 };
 
 type Props = { project: PortfolioProject; onPress?: () => void };
 
 export function PortfolioCard({ project, onPress }: Props) {
   const { theme } = useAppTheme();
+  const scale = useSharedValue(1);
+  const imageScale = useSharedValue(1);
+
+  const cardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const imageStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: imageScale.value }],
+  }));
 
   return (
-    <Pressable onPress={onPress} style={styles.wrap}>
+    <AnimatedPressable
+      onPress={onPress}
+      onHoverIn={() => {
+        scale.value = withTiming(1.012, SOFT);
+        imageScale.value = withTiming(1.04, SOFT);
+      }}
+      onHoverOut={() => {
+        scale.value = withTiming(1, SOFT);
+        imageScale.value = withTiming(1, SOFT);
+      }}
+      onPressIn={() => {
+        scale.value = withTiming(0.99, { duration: 120 });
+      }}
+      onPressOut={() => {
+        scale.value = withTiming(1, SOFT);
+        imageScale.value = withTiming(1, SOFT);
+      }}
+      style={[styles.wrap, cardStyle]}
+    >
       <GlassCard padding="none" style={styles.card}>
-        <Image
-          source={project.image}
-          style={styles.bannerImage}
-          resizeMode="cover"
-          accessibilityLabel={`${project.title} preview`}
-        />
+        <View style={styles.bannerClip}>
+          <Animated.View style={[styles.bannerAnim, imageStyle]}>
+            <Image
+              source={project.image}
+              style={styles.bannerImage}
+              resizeMode="cover"
+              accessibilityLabel={`${project.title} preview`}
+            />
+          </Animated.View>
+        </View>
         <View style={styles.body}>
           <Text style={[styles.category, { color: theme.gradient[1] }]} numberOfLines={1}>
             {project.category}
@@ -35,7 +75,7 @@ export function PortfolioCard({ project, onPress }: Props) {
           </Text>
         </View>
       </GlassCard>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -49,8 +89,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     height: CARD_HEIGHT,
   },
-  bannerImage: {
+  bannerClip: {
     height: BANNER_HEIGHT,
+    width: '100%',
+    overflow: 'hidden',
+  },
+  bannerAnim: {
+    width: '100%',
+    height: '100%',
+  },
+  bannerImage: {
+    height: '100%',
     width: '100%',
   },
   body: {

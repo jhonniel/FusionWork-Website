@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 import { BlogPost } from '../../constants/blog';
@@ -34,10 +34,10 @@ export function BlogCard({ post, onPress }: Props) {
     <AnimatedPressable
       onPress={onPress}
       onPressIn={() => {
-        scale.value = withSpring(0.99, { damping: 18 });
+        scale.value = withTiming(0.99, { duration: 100 });
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, { damping: 16 });
+        scale.value = withTiming(1, { duration: 160 });
       }}
       style={[styles.wrap, animatedStyle]}
       accessibilityRole="button"

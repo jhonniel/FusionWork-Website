@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 import { useAppTheme } from '../../context/ThemeContext';
@@ -63,10 +63,10 @@ export function FuturisticButton({
         disabled={disabled}
         onPressIn={() => {
           if (disabled) return;
-          scale.value = withSpring(0.98, { damping: 18 });
+          scale.value = withTiming(0.98, { duration: 100 });
         }}
         onPressOut={() => {
-          scale.value = withSpring(1, { damping: 18 });
+          scale.value = withTiming(1, { duration: 160 });
         }}
         style={[styles.btn, fullWidth && styles.fullWidth, animatedStyle, style]}
       >
@@ -92,10 +92,10 @@ export function FuturisticButton({
       disabled={disabled}
       onPressIn={() => {
         if (disabled) return;
-        scale.value = withSpring(0.98, { damping: 18 });
+        scale.value = withTiming(0.98, { duration: 100 });
       }}
       onPressOut={() => {
-        scale.value = withSpring(1, { damping: 18 });
+        scale.value = withTiming(1, { duration: 160 });
       }}
       style={[
         styles.btn,

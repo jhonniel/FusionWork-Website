@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     width: 240,
     height: 240,
     borderRadius: 120,
-    backgroundColor: 'rgba(99, 102, 241, 0.18)',
+    backgroundColor: 'rgba(230, 0, 0, 0.14)',
     zIndex: 0,
   },
   glowWeb: {

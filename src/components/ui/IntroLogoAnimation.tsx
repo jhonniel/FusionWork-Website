@@ -11,7 +11,6 @@ import Animated, {
   withDelay,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Line } from 'react-native-svg';
@@ -93,7 +92,10 @@ function AnimatedIconNode({
   const py = y * layoutScale;
 
   useEffect(() => {
-    pop.value = withDelay(delay + 180, withSpring(1, { damping: 11, stiffness: 160 }));
+    pop.value = withDelay(
+      delay + 180,
+      withTiming(1, { duration: 380, easing: Easing.out(Easing.cubic) }),
+    );
     opacity.value = withDelay(delay + 180, withTiming(1, { duration: 280 }));
   }, [delay, pop, opacity]);
 
@@ -134,10 +136,16 @@ export function IntroLogoAnimation({ width = 280, onAnimationReady }: Props) {
   const stageH = iconsH + logoH - width * 0.06;
 
   useEffect(() => {
-    hubScale.value = withDelay(80, withSpring(1, { damping: 14 }));
+    hubScale.value = withDelay(
+      80,
+      withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) }),
+    );
     iconsLayerOpacity.value = withDelay(850, withTiming(0, { duration: 350 }));
     logoOpacity.value = withDelay(750, withTiming(1, { duration: 500, easing: Easing.out(Easing.cubic) }));
-    logoScale.value = withDelay(750, withSpring(1, { damping: 11, stiffness: 90 }));
+    logoScale.value = withDelay(
+      750,
+      withTiming(1, { duration: 480, easing: Easing.out(Easing.cubic) }),
+    );
     logoFloat.value = withDelay(
       1300,
       withRepeat(

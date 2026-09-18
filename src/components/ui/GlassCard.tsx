@@ -4,7 +4,6 @@ import React from 'react';
 import { Platform, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { useAppTheme } from '../../context/ThemeContext';
-import { brand } from '../../theme/brand';
 import { radius, spacing } from '../../theme/typography';
 
 type Props = {
