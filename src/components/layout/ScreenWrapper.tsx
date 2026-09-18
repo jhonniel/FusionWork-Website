@@ -14,6 +14,7 @@ import { Footer } from './Footer';
 import { Navbar } from './Navbar';
 import { ParticleBackground } from './ParticleBackground';
 import { ScrollProgress } from './ScrollProgress';
+import { SiteChat } from './SiteChat';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
@@ -89,6 +90,7 @@ export function ScreenWrapper({
         <View style={styles.page}>{children}</View>
         {showFooter ? <Footer onNavigate={handleNav} /> : null}
       </AnimatedScrollView>
+      <SiteChat onNavigate={handleNav} />
     </View>
   );
 }

@@ -4,6 +4,7 @@ type ContactBody = {
   name?: string;
   email?: string;
   message?: string;
+  source?: string;
 };
 
 function escapeHtml(value: string) {
@@ -64,10 +65,14 @@ function thankYouHtml(name: string) {
   `;
 }
 
-function notifyHtml(name: string, email: string, message: string) {
+function notifyHtml(name: string, email: string, message: string, source?: string) {
+  const sourceLine = source
+    ? `<p style="margin: 0 0 8px;"><strong>Source:</strong> ${escapeHtml(source)}</p>`
+    : '';
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #0f172a; max-width: 560px; margin: 0 auto; padding: 24px;">
-      <h1 style="font-size: 20px; margin: 0 0 16px;">New contact form message</h1>
+      <h1 style="font-size: 20px; margin: 0 0 16px;">New contact message</h1>
+      ${sourceLine}
       <p style="margin: 0 0 8px;"><strong>Name:</strong> ${escapeHtml(name)}</p>
       <p style="margin: 0 0 8px;"><strong>Email:</strong> ${escapeHtml(email)}</p>
       <p style="margin: 16px 0 8px;"><strong>Message:</strong></p>
@@ -103,6 +108,7 @@ export default async function handler(
   const name = String(req.body?.name ?? '').trim();
   const email = String(req.body?.email ?? '').trim().toLowerCase();
   const message = String(req.body?.message ?? '').trim();
+  const source = String(req.body?.source ?? '').trim() || undefined;
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Please fill in all fields' });
@@ -136,8 +142,10 @@ export default async function handler(
     from,
     to: [notifyTo],
     replyTo: email,
-    subject: `New message from ${name}`,
-    html: notifyHtml(name, email, message),
+    subject: source
+      ? `New ${source} message from ${name}`
+      : `New message from ${name}`,
+    html: notifyHtml(name, email, message, source),
   });
 
   if (notify.error) {
