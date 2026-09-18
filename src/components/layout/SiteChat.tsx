@@ -10,6 +10,16 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Animated, {
+  Easing,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { COMPANY } from '../../constants/company';
 import { useAppTheme } from '../../context/ThemeContext';
@@ -23,6 +33,13 @@ import {
 } from '../../lib/siteChat';
 import { brand } from '../../theme/brand';
 import { fonts, radius } from '../../theme/typography';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const OPEN_MS = 320;
+const CLOSE_MS = 240;
+const OPEN_EASE = Easing.out(Easing.cubic);
+const CLOSE_EASE = Easing.in(Easing.cubic);
 
 type Message = {
   id: string;
@@ -50,6 +67,7 @@ export function SiteChat({ onNavigate }: Props) {
   const { theme } = useAppTheme();
   const { isMobile } = useResponsive();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [leadStep, setLeadStep] = useState<LeadStep | null>(null);
@@ -63,12 +81,64 @@ export function SiteChat({ onNavigate }: Props) {
     },
   ]);
   const scrollRef = useRef<ScrollView>(null);
+  const panelProgress = useSharedValue(0);
+  const fabScale = useSharedValue(1);
+
+  const finishUnmount = useCallback(() => {
+    setMounted(false);
+  }, []);
+
+  const openChat = useCallback(() => {
+    panelProgress.value = 0;
+    setMounted(true);
+    setOpen(true);
+    fabScale.value = withSequence(
+      withSpring(1.08, { damping: 14, stiffness: 200 }),
+      withTiming(1, { duration: 220 }),
+    );
+  }, [fabScale, panelProgress]);
+
+  const closeChat = useCallback(() => {
+    setOpen(false);
+    panelProgress.value = withTiming(0, { duration: CLOSE_MS, easing: CLOSE_EASE }, (finished) => {
+      if (finished) runOnJS(finishUnmount)();
+    });
+    fabScale.value = withSequence(
+      withSpring(0.94, { damping: 16 }),
+      withTiming(1, { duration: 200 }),
+    );
+  }, [fabScale, finishUnmount, panelProgress]);
+
+  const toggleChat = useCallback(() => {
+    if (open) closeChat();
+    else openChat();
+  }, [closeChat, open, openChat]);
+
+  useEffect(() => {
+    if (!mounted || !open) return;
+    panelProgress.value = withTiming(1, { duration: OPEN_MS, easing: OPEN_EASE });
+  }, [mounted, open, panelProgress]);
 
   useEffect(() => {
     if (!open) return;
     const t = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
     return () => clearTimeout(t);
   }, [messages, open]);
+
+  const panelAnimStyle = useAnimatedStyle(() => ({
+    opacity: panelProgress.value,
+    transform: [
+      { translateY: interpolate(panelProgress.value, [0, 1], [28, 0]) },
+      { scale: interpolate(panelProgress.value, [0, 1], [0.94, 1]) },
+    ],
+  }));
+
+  const fabAnimStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: fabScale.value },
+      { rotate: `${interpolate(panelProgress.value, [0, 1], [0, 90])}deg` },
+    ],
+  }));
 
   const pushBot = useCallback((text: string, extras?: Partial<Message>) => {
     setMessages((prev) => [
@@ -203,6 +273,7 @@ export function SiteChat({ onNavigate }: Props) {
       left: isMobile ? 12 : undefined,
       bottom: isMobile ? 76 : 88,
     },
+    panelAnimStyle,
   ];
 
   const placeholder = leadStep
@@ -215,150 +286,153 @@ export function SiteChat({ onNavigate }: Props) {
 
   return (
     <View pointerEvents="box-none" style={styles.host}>
-      {open ? (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={panelStyle}
-        >
-          <View style={[styles.header, { borderBottomColor: theme.cardBorder, backgroundColor: brand.red }]}>
-            <View style={styles.headerText}>
-              <Text style={styles.headerTitle}>{COMPANY.name} Chat</Text>
-            </View>
-            <Pressable
-              onPress={() => setOpen(false)}
-              accessibilityRole="button"
-              accessibilityLabel="Close chat"
-              hitSlop={10}
-            >
-              <Ionicons name="close" size={22} color="#fff" />
-            </Pressable>
-          </View>
-
-          <ScrollView
-            ref={scrollRef}
-            style={styles.messages}
-            contentContainerStyle={styles.messagesContent}
-            keyboardShouldPersistTaps="handled"
+      {mounted ? (
+        <Animated.View pointerEvents={open ? 'auto' : 'none'} style={panelStyle}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.panelInner}
           >
-            {messages.map((m) => (
-              <View
-                key={m.id}
-                style={[
-                  styles.bubble,
-                  m.role === 'user'
-                    ? [styles.userBubble, { backgroundColor: brand.red }]
-                    : [
-                        styles.botBubble,
-                        { backgroundColor: theme.backgroundSecondary, borderColor: theme.cardBorder },
-                      ],
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.bubbleText,
-                    { color: m.role === 'user' ? '#fff' : theme.text },
-                  ]}
-                >
-                  {m.text}
-                </Text>
-                {m.role === 'bot' && m.suggestLead ? (
-                  <Pressable
-                    onPress={startLead}
-                    disabled={sending || !!leadStep}
-                    style={[
-                      styles.contactBtn,
-                      { backgroundColor: `${brand.red}18`, borderColor: `${brand.red}55` },
-                    ]}
-                  >
-                    <Text style={[styles.contactBtnText, { color: brand.red }]}>Send a message</Text>
-                  </Pressable>
-                ) : null}
-                {m.role === 'bot' && m.suggestContact ? (
-                  <Pressable
-                    onPress={() => {
-                      setOpen(false);
-                      onNavigate('Contact');
-                    }}
-                    style={[
-                      styles.contactBtn,
-                      { backgroundColor: theme.background, borderColor: theme.cardBorder },
-                    ]}
-                  >
-                    <Text style={[styles.contactBtnText, { color: theme.text }]}>Go to Contact</Text>
-                  </Pressable>
-                ) : null}
+            <View style={[styles.header, { borderBottomColor: theme.cardBorder, backgroundColor: brand.red }]}>
+              <View style={styles.headerText}>
+                <Text style={styles.headerTitle}>{COMPANY.name} Chat</Text>
               </View>
-            ))}
-          </ScrollView>
+              <Pressable
+                onPress={closeChat}
+                accessibilityRole="button"
+                accessibilityLabel="Close chat"
+                hitSlop={10}
+              >
+                <Ionicons name="close" size={22} color="#fff" />
+              </Pressable>
+            </View>
 
-          {!leadStep ? (
-            <View style={styles.quickRow}>
-              {CHAT_QUICK_PROMPTS.map((prompt) => (
-                <Pressable
-                  key={prompt}
-                  onPress={() => send(prompt)}
-                  disabled={sending}
+            <ScrollView
+              ref={scrollRef}
+              style={styles.messages}
+              contentContainerStyle={styles.messagesContent}
+              keyboardShouldPersistTaps="handled"
+            >
+              {messages.map((m) => (
+                <View
+                  key={m.id}
                   style={[
-                    styles.quickChip,
-                    { borderColor: theme.cardBorder, backgroundColor: theme.background },
+                    styles.bubble,
+                    m.role === 'user'
+                      ? [styles.userBubble, { backgroundColor: brand.red }]
+                      : [
+                          styles.botBubble,
+                          { backgroundColor: theme.backgroundSecondary, borderColor: theme.cardBorder },
+                        ],
                   ]}
                 >
-                  <Text style={[styles.quickChipText, { color: theme.textMuted }]} numberOfLines={1}>
-                    {prompt}
+                  <Text
+                    style={[
+                      styles.bubbleText,
+                      { color: m.role === 'user' ? '#fff' : theme.text },
+                    ]}
+                  >
+                    {m.text}
                   </Text>
-                </Pressable>
+                  {m.role === 'bot' && m.suggestLead ? (
+                    <Pressable
+                      onPress={startLead}
+                      disabled={sending || !!leadStep}
+                      style={[
+                        styles.contactBtn,
+                        { backgroundColor: `${brand.red}18`, borderColor: `${brand.red}55` },
+                      ]}
+                    >
+                      <Text style={[styles.contactBtnText, { color: brand.red }]}>Send a message</Text>
+                    </Pressable>
+                  ) : null}
+                  {m.role === 'bot' && m.suggestContact ? (
+                    <Pressable
+                      onPress={() => {
+                        closeChat();
+                        onNavigate('Contact');
+                      }}
+                      style={[
+                        styles.contactBtn,
+                        { backgroundColor: theme.background, borderColor: theme.cardBorder },
+                      ]}
+                    >
+                      <Text style={[styles.contactBtnText, { color: theme.text }]}>Go to Contact</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
               ))}
-            </View>
-          ) : null}
+            </ScrollView>
 
-          <View style={[styles.composer, { borderTopColor: theme.cardBorder }]}>
-            <TextInput
-              value={input}
-              onChangeText={setInput}
-              placeholder={placeholder}
-              placeholderTextColor={theme.textSubtle}
-              editable={!sending}
-              style={[
-                styles.input,
-                {
-                  color: theme.text,
-                  borderColor: theme.cardBorder,
-                  backgroundColor: theme.background,
-                  fontFamily: fonts.regular,
-                },
-              ]}
-              onSubmitEditing={() => send(input)}
-              returnKeyType="send"
-              keyboardType={leadStep === 'email' ? 'email-address' : 'default'}
-              autoCapitalize={leadStep === 'email' ? 'none' : 'sentences'}
-            />
-            <Pressable
-              onPress={() => send(input)}
-              style={[
-                styles.sendBtn,
-                { backgroundColor: brand.red, opacity: input.trim() && !sending ? 1 : 0.5 },
-              ]}
-              disabled={!input.trim() || sending}
-              accessibilityRole="button"
-              accessibilityLabel="Send message"
-            >
-              <Ionicons name="send" size={18} color="#fff" />
-            </Pressable>
-          </View>
-        </KeyboardAvoidingView>
+            {!leadStep ? (
+              <View style={styles.quickRow}>
+                {CHAT_QUICK_PROMPTS.map((prompt) => (
+                  <Pressable
+                    key={prompt}
+                    onPress={() => send(prompt)}
+                    disabled={sending}
+                    style={[
+                      styles.quickChip,
+                      { borderColor: theme.cardBorder, backgroundColor: theme.background },
+                    ]}
+                  >
+                    <Text style={[styles.quickChipText, { color: theme.textMuted }]} numberOfLines={1}>
+                      {prompt}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+
+            <View style={[styles.composer, { borderTopColor: theme.cardBorder }]}>
+              <TextInput
+                value={input}
+                onChangeText={setInput}
+                placeholder={placeholder}
+                placeholderTextColor={theme.textSubtle}
+                editable={!sending}
+                style={[
+                  styles.input,
+                  {
+                    color: theme.text,
+                    borderColor: theme.cardBorder,
+                    backgroundColor: theme.background,
+                    fontFamily: fonts.regular,
+                  },
+                ]}
+                onSubmitEditing={() => send(input)}
+                returnKeyType="send"
+                keyboardType={leadStep === 'email' ? 'email-address' : 'default'}
+                autoCapitalize={leadStep === 'email' ? 'none' : 'sentences'}
+              />
+              <Pressable
+                onPress={() => send(input)}
+                style={[
+                  styles.sendBtn,
+                  { backgroundColor: brand.red, opacity: input.trim() && !sending ? 1 : 0.5 },
+                ]}
+                disabled={!input.trim() || sending}
+                accessibilityRole="button"
+                accessibilityLabel="Send message"
+              >
+                <Ionicons name="send" size={18} color="#fff" />
+              </Pressable>
+            </View>
+          </KeyboardAvoidingView>
+        </Animated.View>
       ) : null}
 
-      <Pressable
-        onPress={() => setOpen((v) => !v)}
+      <AnimatedPressable
+        onPress={toggleChat}
         style={[
           styles.fab,
           { backgroundColor: brand.red, bottom: isMobile ? 16 : 24, right: isMobile ? 16 : 24 },
+          fabAnimStyle,
         ]}
         accessibilityRole="button"
         accessibilityLabel={open ? 'Close chat' : 'Open chat'}
       >
         <Ionicons name={open ? 'close' : 'chatbubbles'} size={26} color="#fff" />
-      </Pressable>
+      </AnimatedPressable>
     </View>
   );
 }
@@ -394,6 +468,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 24,
     elevation: 12,
+  },
+  panelInner: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',

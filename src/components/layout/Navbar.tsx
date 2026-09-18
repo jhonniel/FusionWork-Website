@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  LayoutChangeEvent,
   Modal,
   Platform,
   Pressable,
@@ -10,8 +11,12 @@ import {
   View,
 } from 'react-native';
 import Animated, {
+  Easing,
   interpolate,
+  interpolateColor,
   useAnimatedStyle,
+  useSharedValue,
+  withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,6 +29,9 @@ import { fonts, radius } from '../../theme/typography';
 import { BrandLogo } from '../ui/BrandLogo';
 import { FuturisticButton } from '../ui/FuturisticButton';
 
+const TAB_MS = 280;
+const TAB_EASE = Easing.out(Easing.cubic);
+
 type Props = {
   currentRoute: string;
   onNavigate: (route: string) => void;
@@ -31,11 +39,73 @@ type Props = {
   topInset: number;
 };
 
+type TabLayout = { x: number; width: number };
+
+function NavTab({
+  label,
+  active,
+  mutedColor,
+  onPress,
+  onLayout,
+}: {
+  label: string;
+  active: boolean;
+  mutedColor: string;
+  onPress: () => void;
+  onLayout: (e: LayoutChangeEvent) => void;
+}) {
+  const progress = useSharedValue(active ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = withTiming(active ? 1 : 0, { duration: TAB_MS, easing: TAB_EASE });
+  }, [active, progress]);
+
+  const textStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(progress.value, [0, 1], [mutedColor, brand.red]),
+    transform: [{ scale: interpolate(progress.value, [0, 1], [1, 1.03]) }],
+  }));
+
+  return (
+    <Pressable onPress={onPress} onLayout={onLayout} style={styles.linkPill}>
+      <Animated.Text
+        style={[
+          styles.link,
+          textStyle,
+          { fontFamily: active ? fonts.semibold : fonts.medium },
+        ]}
+      >
+        {label}
+      </Animated.Text>
+    </Pressable>
+  );
+}
+
 export function Navbar({ currentRoute, onNavigate, scrollY, topInset }: Props) {
   const { theme, mode, toggleTheme } = useAppTheme();
   const { isMobile, isDesktop, horizontalPadding, isSmallPhone } = useResponsive();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [tabLayouts, setTabLayouts] = useState<Record<string, TabLayout>>({});
   const insets = useSafeAreaInsets();
+
+  const activeIndex = Math.max(
+    0,
+    NAV_LINKS.findIndex((l) => l.route === currentRoute),
+  );
+  const indicatorX = useSharedValue(0);
+  const indicatorW = useSharedValue(0);
+  const indicatorOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    const route = NAV_LINKS[activeIndex]?.route;
+    const layout = route ? tabLayouts[route] : undefined;
+    if (!layout || layout.width <= 0) {
+      indicatorOpacity.value = withTiming(0, { duration: 120 });
+      return;
+    }
+    indicatorX.value = withTiming(layout.x, { duration: TAB_MS, easing: TAB_EASE });
+    indicatorW.value = withTiming(layout.width, { duration: TAB_MS, easing: TAB_EASE });
+    indicatorOpacity.value = withTiming(1, { duration: 180 });
+  }, [activeIndex, indicatorOpacity, indicatorW, indicatorX, tabLayouts]);
 
   const barStyle = useAnimatedStyle(() => ({
     borderBottomColor: `rgba(230, 0, 0, ${interpolate(scrollY.value, [0, 100], [0, 0.25])})`,
@@ -47,36 +117,46 @@ export function Navbar({ currentRoute, onNavigate, scrollY, topInset }: Props) {
         : 'transparent',
   }));
 
+  const indicatorStyle = useAnimatedStyle(() => ({
+    opacity: indicatorOpacity.value,
+    transform: [{ translateX: indicatorX.value }],
+    width: indicatorW.value,
+  }));
+
+  const setTabLayout = (route: string, e: LayoutChangeEvent) => {
+    const { x, width } = e.nativeEvent.layout;
+    setTabLayouts((prev) => {
+      const existing = prev[route];
+      if (existing && Math.abs(existing.x - x) < 0.5 && Math.abs(existing.width - width) < 0.5) {
+        return prev;
+      }
+      return { ...prev, [route]: { x, width } };
+    });
+  };
+
   const navLinks = (
     <View style={styles.links}>
-      {NAV_LINKS.map((link) => {
-        const active = currentRoute === link.route;
-        return (
-          <Pressable
-            key={link.route}
-            onPress={() => onNavigate(link.route)}
-            style={[
-              styles.linkPill,
-              active && {
-                backgroundColor: `${brand.red}18`,
-                borderColor: `${brand.red}44`,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.link,
-                {
-                  color: active ? brand.red : theme.textMuted,
-                  fontFamily: active ? fonts.semibold : fonts.medium,
-                },
-              ]}
-            >
-              {link.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.indicator,
+          {
+            backgroundColor: `${brand.red}18`,
+            borderColor: `${brand.red}44`,
+          },
+          indicatorStyle,
+        ]}
+      />
+      {NAV_LINKS.map((link) => (
+        <NavTab
+          key={link.route}
+          label={link.label}
+          active={currentRoute === link.route}
+          mutedColor={theme.textMuted}
+          onPress={() => onNavigate(link.route)}
+          onLayout={(e) => setTabLayout(link.route, e)}
+        />
+      ))}
     </View>
   );
 
@@ -228,16 +308,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   links: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  indicator: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    borderRadius: radius.md,
+    borderWidth: 1,
   },
   linkPill: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: 'transparent',
+    zIndex: 1,
   },
   link: { fontSize: 14 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 },
